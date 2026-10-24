@@ -2,7 +2,7 @@ import { xml } from "@codemirror/lang-xml";
 import { Compartment } from "@codemirror/state";
 import { Decoration, EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { SourceRange } from "../domain/types";
 
 interface XmlEditorProps {
@@ -17,7 +17,10 @@ const highlightCompartment = new Compartment();
 
 export function XmlEditor({ xmlText, range, scrollToken, onChange, onCursor }: XmlEditorProps) {
   const viewRef = useRef<EditorView | null>(null);
+  const rangeRef = useRef(range);
   const programmatic = useRef(false);
+  const [viewEpoch, setViewEpoch] = useState(0);
+  rangeRef.current = range;
   const extensions = useMemo(
     () => [
       xml(),
@@ -47,12 +50,13 @@ export function XmlEditor({ xmlText, range, scrollToken, onChange, onCursor }: X
         EditorView.decorations.of(Decoration.set(mark ? [mark] : [], true)),
       ),
     });
-  }, [range]);
+  }, [range, viewEpoch]);
 
   useEffect(() => {
     const view = viewRef.current;
-    if (!view || scrollToken === 0 || !range) return;
-    const anchor = Math.min(range.start, view.state.doc.length);
+    const current = rangeRef.current;
+    if (!view || scrollToken === 0 || !current) return;
+    const anchor = Math.min(current.start, view.state.doc.length);
     programmatic.current = true;
     view.dispatch({
       selection: { anchor },
@@ -60,7 +64,7 @@ export function XmlEditor({ xmlText, range, scrollToken, onChange, onCursor }: X
       effects: EditorView.scrollIntoView(anchor, { y: "center" }),
     });
     programmatic.current = false;
-  }, [scrollToken, range]);
+  }, [scrollToken, viewEpoch]);
 
   return (
     <div className="editor-frame" data-testid="xml-editor">
@@ -71,6 +75,7 @@ export function XmlEditor({ xmlText, range, scrollToken, onChange, onCursor }: X
         basicSetup={{ lineNumbers: true, foldGutter: false }}
         onCreateEditor={(view) => {
           viewRef.current = view;
+          setViewEpoch((epoch) => epoch + 1);
         }}
         onChange={(value) => onChange(value)}
         onUpdate={(update) => {
