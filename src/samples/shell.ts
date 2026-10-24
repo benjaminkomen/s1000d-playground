@@ -82,6 +82,7 @@ function identity(code: DmCode, techName: string, infoName: string, schema: stri
         <dmTitle>
           <techName>${techName}</techName>
           <infoName>${infoName}</infoName>
+          <infoNameVariant>Training example</infoNameVariant>
         </dmTitle>
       </dmAddressItems>
     </dmAddress>
@@ -97,7 +98,7 @@ export function faultModule(input: {
   faultDescr: string;
   steps: string;
 }): string {
-  return `${identity(input.code, input.techName, input.infoName, "http://www.s1000d.org/S1000D_4-2/xml_schema_flat/fault.xsd")}
+  return `${identity(input.code, input.techName, input.infoName, "http://www.s1000d.org/S1000D_7/xml_schema_flat/fault.xsd")}
   <content>
     <faultIsolation>
       <faultIsolationProcedure>
@@ -132,7 +133,7 @@ ${input.variables}
       </variableDeclarations>
 `
     : "";
-  return `${identity(input.code, input.techName, input.infoName, "http://www.s1000d.org/S1000D_4-2/xml_schema_flat/process.xsd")}
+  return `${identity(input.code, input.techName, input.infoName, "http://www.s1000d.org/S1000D_7/xml_schema_flat/process.xsd")}
   <content>
     <process>
 ${declarations}      <dmSeq>

@@ -48,8 +48,9 @@ export function parseDocument(name: string, xml: string): ParsedDocument {
   }
 
   const dmc = formatDmc(code);
-  const techName = textOf(root.querySelector("dmTitle > techName")) || dmc;
-  const infoName = textOf(root.querySelector("dmTitle > infoName"));
+  const title = readDmTitle(root.querySelector("dmAddressItems > dmTitle"));
+  const techName = title.techName || dmc;
+  const infoName = title.infoName;
   const scanned = scanElements(xml);
   const seen = new Set<string>();
   for (const element of scanned) {
@@ -117,6 +118,14 @@ export function parseLibrary(documents: { name: string; xml: string }[]): {
     modules.push(parsed.module);
   }
   return { modules, diagnostics };
+}
+
+function readDmTitle(title: Element | null): { techName: string; infoName: string } {
+  const techName = textOf(title ? child(title, "techName") : null);
+  const infoName = [textOf(title ? child(title, "infoName") : null), textOf(title ? child(title, "infoNameVariant") : null)]
+    .filter(Boolean)
+    .join(" ");
+  return { techName, infoName };
 }
 
 function child(element: Element, name: string): Element | null {
@@ -407,8 +416,9 @@ function collectIds(items: Instruction[]): StepId[] {
 function readDmRef(element: Element): DmCall {
   const dmCode = element.querySelector("dmRefIdent > dmCode");
   const code = dmCode ? readDmCode(dmCode) : null;
-  const techName = textOf(element.querySelector("dmTitle > techName"));
-  const infoName = textOf(element.querySelector("dmTitle > infoName"));
+  const title = readDmTitle(element.querySelector("dmRefAddressItems > dmTitle"));
+  const techName = title.techName;
+  const infoName = title.infoName;
   const behavior = child(element, "behavior");
   const fragment = element.getAttribute("referredFragment");
   return {

@@ -94,7 +94,7 @@ export function App() {
     <div className="app">
       <header className="top">
         <div>
-          <p className="kicker">Issue 4.2 element names</p>
+          <p className="kicker">Issue 7 element names</p>
           <h1>S1000D Playground</h1>
         </div>
         <nav className="samples" aria-label="Sample data modules">

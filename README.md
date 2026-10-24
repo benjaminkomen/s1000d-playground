@@ -1,6 +1,6 @@
 # s1000d-playground
 
-This is a public learning tool for S1000D Issue 4.2. An editable data module sits beside a runner that steps through the same XML. The samples are generic training modules. They are not taken from a product manual.
+This is a public learning tool for S1000D Issue 7. An editable data module sits beside a runner that steps through the same XML. The samples are generic training modules. They are not taken from a product manual.
 
 ## Run the playground
 
@@ -17,13 +17,13 @@ Open the URL Vite prints. The battery sample is selected. Click an answer on the
 
 ## What a data module is
 
-A data module is one S1000D XML document. The root element is `dmodule`. Identity and status come first, then `content`. The playground reads two content types from the Issue 4.2 schemas published by the [S1000D](https://www.s1000d.org/) council.
+A data module is one S1000D XML document. The root element is `dmodule`. Identity and status come first, then `content`. The playground reads two content types from the Issue 7 schemas published by the [S1000D](https://www.s1000d.org/) council. Those schemas have no target namespace.
 
 - Fault isolation uses `faultIsolation`, `isolationProcedure`, `isolationStep`, `isolationStepQuestion`, `yesNoAnswer` or `listOfChoices`, `isolationStepAnswer`, and `isolationProcedureEnd`. Each answer carries `nextActionRefId`. That attribute is an `IDREF` to the next step. The runner follows those references. It does not walk the steps in document order. A retry is a `nextActionRefId` that points back at an earlier `id`. An `isolationProcedureEnd` has actions and no answer.
-- A called procedure is a `dmRef` inside an `action`. `behavior linkShow="replaceAndReturnToSource"` is the Issue 4.2 way to open that module and come back. The engine sample does this. `linkActuate` on that reference is `onRequest`, so the runner waits for the Run button.
+- A called procedure is a `dmRef` inside an `action`. `behavior linkShow="replaceAndReturnToSource"` is the Issue 7 value for opening that module and coming back. The engine sample does this. `linkActuate` on that reference is `onRequest`, so the runner waits for the Run button.
 - A process module uses `variableDeclarations` and `dmSeq`. A `dmSeq` contains `dmNode`, `dmIf`, and `dmLoop`. A `dmNode` can hold procedural steps or a `dialog` `menu`. A `dmIf` has an `expression`, a `dmThenSeq`, and an optional `dmElseSeq`. A `dmLoop` tests an expression, runs its `dmSeq` while the expression is true, and can assign variables with `assertion`.
 
-The schema files are [fault.xsd](http://www.s1000d.org/S1000D_4-2/xml_schema_flat/fault.xsd) and [process.xsd](http://www.s1000d.org/S1000D_4-2/xml_schema_flat/process.xsd), both dated 2016-12-31.
+The schema files are [fault.xsd](http://www.s1000d.org/S1000D_7/xml_schema_flat/fault.xsd) and [process.xsd](http://www.s1000d.org/S1000D_7/xml_schema_flat/process.xsd). Both annotations say Issue 7, dated 2026-07-16. The step names above are the names in those files. `dmTitle` may also contain `infoNameVariant`. The samples use that element for the words "Training example". `dmStatus` may contain `controlAuthorityGroup`. The samples leave that group out.
 
 A data module code, the DMC, is the hyphenated form of the `dmCode` attributes.
 
@@ -43,7 +43,7 @@ The battery sample is `S1000D-A-24-31-00-00A-420A-A`. The info-code numbers in t
 
 The runner checks three things. The XML must be well-formed. Every `nextActionRefId`, procedure `dmRef`, and `variableRef` must resolve. Every step must be reachable from the first module, counting both process branches and a loop body once. A cycle is reachable. It is not an error.
 
-The playground does not validate against the XSD. The Issue 4.2 schemas are copyright ASD and the ministries of defence of ASD member countries. Their notice ships the schemas "as is" and does not grant redistribution under this project's MIT license. Copying `fault.xsd` or `process.xsd` into the repository, or bundling them through `xmllint-wasm`, would ignore that notice. Download the schemas from the URLs above if you want to check a module with your own tools. The samples point `xsi:noNamespaceSchemaLocation` at those public URLs. The files are not stored here.
+The playground does not validate against the XSD. The Issue 7 schema header is copyright 2026 by the Aerospace, Security and Defence Industries Association of Europe (ASD). It names ASD, the Aerospace Industries Association of America, and the ATA e-Business Program as publishers. The files are provided "as is", and the header says the copyright details are in the S1000D specification. That notice does not grant redistribution under this project's MIT license. The [download list](https://users.s1000d.org/ProductList.aspx) says use of the downloads is subject to the S1000D terms and conditions. Copying `fault.xsd` or `process.xsd` into the repository would ignore that notice. Download the schemas from the URLs above if you want to check a module with your own tools. The samples point `xsi:noNamespaceSchemaLocation` at those public URLs. The files are not stored here.
 
 ## Checks
 

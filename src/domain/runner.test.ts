@@ -42,6 +42,16 @@ function visitAll(session: Session): Set<string> {
 }
 
 describe("sample libraries", () => {
+  it("points every sample at the Issue 7 flat schemas", () => {
+    for (const sample of samples) {
+      for (const module of sample.modules) {
+        expect(module.xml).toContain("http://www.s1000d.org/S1000D_7/xml_schema_flat/");
+        expect(module.xml).toContain("<infoNameVariant>Training example</infoNameVariant>");
+        expect(module.xml).not.toContain("S1000D_4-2");
+      }
+    }
+  });
+
   it.each(samples.map((sample) => sample.id))("%s has no validation errors", (id) => {
     const opened = openSample(id);
     expect(opened.errors).toEqual([]);
