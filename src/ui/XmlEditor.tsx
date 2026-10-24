@@ -1,8 +1,8 @@
 import { xml } from "@codemirror/lang-xml";
 import { Compartment } from "@codemirror/state";
-import { Decoration, EditorView } from "@codemirror/view";
+import { Decoration, EditorView, type ViewUpdate } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SourceRange } from "../domain/types";
 
 interface XmlEditorProps {
@@ -20,7 +20,23 @@ export function XmlEditor({ xmlText, range, scrollToken, onChange, onCursor }: X
   const rangeRef = useRef(range);
   const programmatic = useRef(false);
   const [viewEpoch, setViewEpoch] = useState(0);
+  const onChangeRef = useRef(onChange);
+  const onCursorRef = useRef(onCursor);
   rangeRef.current = range;
+  onChangeRef.current = onChange;
+  onCursorRef.current = onCursor;
+
+  const handleChange = useCallback((value: string) => {
+    onChangeRef.current(value);
+  }, []);
+
+  const handleUpdate = useCallback((update: ViewUpdate) => {
+    if (programmatic.current) return;
+    if (!update.selectionSet && !update.docChanged) return;
+    onCursorRef.current(update.state.selection.main.head);
+  }, []);
+
+  const basicSetup = useMemo(() => ({ lineNumbers: true, foldGutter: false }), []);
   const extensions = useMemo(
     () => [
       xml(),
@@ -72,17 +88,13 @@ export function XmlEditor({ xmlText, range, scrollToken, onChange, onCursor }: X
         value={xmlText}
         height="100%"
         extensions={extensions}
-        basicSetup={{ lineNumbers: true, foldGutter: false }}
+        basicSetup={basicSetup}
         onCreateEditor={(view) => {
           viewRef.current = view;
           setViewEpoch((epoch) => epoch + 1);
         }}
-        onChange={(value) => onChange(value)}
-        onUpdate={(update) => {
-          if (programmatic.current) return;
-          if (!update.selectionSet && !update.docChanged) return;
-          onCursor(update.state.selection.main.head);
-        }}
+        onChange={handleChange}
+        onUpdate={handleUpdate}
       />
     </div>
   );

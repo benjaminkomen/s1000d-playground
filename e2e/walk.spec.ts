@@ -51,7 +51,7 @@ test("battery load test is the branch after the passing open-circuit choice", as
   await choice(page, "12.4 V or more").click();
   await expect(page.getByTestId("step-card")).toHaveAttribute("data-step-id", "bat-load");
   await expect(page.getByTestId("prompt")).toContainText("9.6 V");
-  await expect(page.locator(".cm-step")).toContainText("bat-load");
+  await expectHighlighted(page, "bat-load");
   await page.screenshot({ path: `${shotDir}/battery-load-test.png` });
 
   await page.getByTestId("back").click();
@@ -144,10 +144,10 @@ test("outline and cursor keep the XML highlight on the same step", async ({ page
   await page.goto("/");
   await page.locator('[data-testid="outline-step"][data-step-id="bat-load"]').click();
   await expect(page.locator('[data-testid="outline-step"][data-step-id="bat-load"]')).toHaveAttribute("data-focused", "true");
-  await expect(page.locator(".cm-step")).toContainText('id="bat-load"');
+  await expectHighlighted(page, 'id="bat-load"');
   await page.screenshot({ path: `${shotDir}/battery-highlight.png` });
 
-  await page.locator(".cm-line", { hasText: 'id="end-fail"' }).click();
+  await page.locator(".cm-line", { hasText: '<isolationProcedureEnd id="end-fail">' }).click();
   await expect(page.locator('[data-testid="outline-step"][data-step-id="end-fail"]')).toHaveAttribute("data-focused", "true");
   await expect(page.getByTestId("step-card")).toHaveAttribute("data-step-id", "bat-ocv");
 });
@@ -158,19 +158,26 @@ test("flow selection highlights the matching XML", async ({ page }) => {
   const node = page.locator('[data-testid="flow-node"][data-step-id="end-pass"]');
   await expect(node).toBeVisible();
   await node.click();
-  await expect(page.locator(".cm-step")).toContainText("end-pass");
+  await expectHighlighted(page, "end-pass");
   await page.screenshot({ path: `${shotDir}/battery-flow.png` });
 });
 
 test("broken XML reports a well-formedness diagnostic", async ({ page }) => {
   await page.goto("/");
-  await page.locator(".cm-content").click();
+  const content = page.locator(".cm-content");
+  await content.click();
   await page.keyboard.press("Control+A");
+  await page.keyboard.press("Backspace");
+  await expect(content).not.toContainText("isolationStep");
   await page.keyboard.insertText("<dmodule>");
   await expect(page.getByTestId("diagnostic")).toContainText("well-formed");
   await expect(page.getByTestId("runner")).toContainText("nothing to step through");
   await page.screenshot({ path: `${shotDir}/broken-xml.png` });
 });
+
+async function expectHighlighted(page: Page, text: string) {
+  await expect(page.locator(".cm-step").filter({ hasText: text }).first()).toBeVisible();
+}
 
 function choice(page: Page, label: string): Locator {
   const exact = new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`);

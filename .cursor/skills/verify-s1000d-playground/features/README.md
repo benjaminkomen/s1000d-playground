@@ -5,7 +5,7 @@ This directory is the maintained source for verifying the playground. Read this 
 ## Baseline preconditions
 
 - Launch the app with `npm run dev -- --host 127.0.0.1 --port 4173` and record the PID.
-- Doctor must show that PID listening, and `curl -sf http://127.0.0.1:4173/` must contain `S1000D Playground`.
+- Doctor must show that PID listening via `lsof -nP -iTCP:4173 -sTCP:LISTEN`, and `curl -sf http://127.0.0.1:4173/` must contain `S1000D Playground`.
 - The battery sample is selected on a fresh load. No account and no saved edits exist.
 - Drive with `npx playwright test` while that server is up. Outside CI the config reuses port 4173.
 - Do not drive a server this run did not start.

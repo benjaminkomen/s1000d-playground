@@ -31,10 +31,10 @@ Run this before clicking when the page looks wrong.
 
 ```bash
 curl -sf http://127.0.0.1:4173/ | grep -F 'S1000D Playground'
-ss -ltnp | grep 4173
+lsof -nP -iTCP:4173 -sTCP:LISTEN
 ```
 
-The listener must be the PID you recorded, and the command must be this repo's Vite process. If the port belongs to another command, do not drive it.
+The listener must be the PID you recorded, and the command must be `node` running this repo's `vite`. If the port belongs to another command, do not drive it. `lsof` is the check because this environment does not provide `ss`.
 
 ## Drive
 
@@ -84,7 +84,7 @@ Stop the PID recorded in Launch. Do not kill a process by name.
 kill <recorded-pid>
 ```
 
-Wait until `ss -ltnp | grep 4173` prints nothing. Do not delete `artifacts/verify/`. After cleanup, list that directory and confirm the PNGs are still there.
+Wait until `lsof -nP -iTCP:4173 -sTCP:LISTEN` prints nothing. Do not delete `artifacts/verify/`. After cleanup, list that directory and confirm the PNGs are still there.
 
 ## Maintenance
 
