@@ -162,6 +162,22 @@ test("flow selection highlights the matching XML", async ({ page }) => {
   await page.screenshot({ path: `${shotDir}/battery-flow.png` });
 });
 
+test("the data module code in the runner and the XML opens the glossary", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("dmc").click();
+  await expect(page.getByTestId("view-glossary")).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByTestId("glossary-sample-dmc")).toContainText("S1000D-A-24-31-00-00A-420A-A");
+  const focused = page.locator('[data-testid="glossary-entry"][data-current="true"]');
+  await expect(focused).toHaveAttribute("data-term-id", "dmc");
+  await expect(page.getByTestId("glossary-entry")).toHaveCount(17);
+
+  await page.getByTestId("view-runner").click();
+  await page.getByTestId("explain-isolation-step").click();
+  await expect(page.locator('[data-testid="glossary-entry"][data-current="true"]')).toHaveAttribute("data-term-id", "isolation-step");
+  await page.getByTestId("explain-dmc").click();
+  await expect(page.locator('[data-testid="glossary-entry"][data-current="true"]')).toHaveAttribute("data-term-id", "dmc");
+});
+
 test("broken XML reports a well-formedness diagnostic", async ({ page }) => {
   await page.goto("/");
   const content = page.locator(".cm-content");

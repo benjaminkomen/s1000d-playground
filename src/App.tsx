@@ -5,7 +5,9 @@ import { act, back, restart, startSession, view, type Session } from "./domain/r
 import { validateLibrary } from "./domain/validate";
 import type { Diagnostic, Dmc, StepId } from "./domain/types";
 import { samples } from "./samples";
+import type { GlossaryId } from "./domain/glossary";
 import { FlowView } from "./ui/FlowView";
+import { GlossaryPanel } from "./ui/GlossaryPanel";
 import { outlineOf } from "./ui/outline";
 import { RunnerPanel } from "./ui/RunnerPanel";
 import { XmlEditor } from "./ui/XmlEditor";
@@ -21,7 +23,8 @@ export function App() {
   const [sampleId, setSampleId] = useState(initial?.id ?? "");
   const [docs, setDocs] = useState<DocTab[]>(() => initial?.modules.map(copyModule) ?? []);
   const [active, setActive] = useState(0);
-  const [pane, setPane] = useState<"runner" | "flow">("runner");
+  const [surface, setSurface] = useState<"runner" | "xml" | "flow" | "glossary">("runner");
+  const [glossaryId, setGlossaryId] = useState("dmc");
   const [session, setSession] = useState<Session | null>(null);
   const [focus, setFocus] = useState<{ dmc: Dmc; stepId: StepId } | null>(null);
   const [scrollToken, setScrollToken] = useState(0);
@@ -71,7 +74,7 @@ export function App() {
     setSampleId(sample.id);
     setDocs(sample.modules.map(copyModule));
     setActive(0);
-    setPane("runner");
+    setSurface("runner");
   }
 
   function follow(next: Session) {
@@ -83,6 +86,11 @@ export function App() {
     setScrollToken((token) => token + 1);
   }
 
+  function openGlossary(id: GlossaryId) {
+    setGlossaryId(id);
+    setSurface("glossary");
+  }
+
   function focusStep(dmc: Dmc, stepId: StepId) {
     setFocus({ dmc, stepId });
     const index = library.modules.findIndex((module) => module.dmc === dmc);
@@ -91,7 +99,7 @@ export function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" data-surface={surface}>
       <header className="top">
         <div>
           <p className="kicker">Issue 7 element names</p>
@@ -111,11 +119,30 @@ export function App() {
             </button>
           ))}
         </nav>
+        <nav className="surface-tabs" role="tablist" aria-label="Phone views">
+          <button type="button" role="tab" data-testid="surface-runner" aria-selected={surface === "runner"} onClick={() => setSurface("runner")}>
+            Runner
+          </button>
+          <button type="button" role="tab" data-testid="surface-xml" aria-selected={surface === "xml"} onClick={() => setSurface("xml")}>
+            XML
+          </button>
+          <button type="button" role="tab" data-testid="surface-flow" aria-selected={surface === "flow"} onClick={() => setSurface("flow")}>
+            Flow
+          </button>
+          <button type="button" role="tab" data-testid="surface-glossary" aria-selected={surface === "glossary"} onClick={() => setSurface("glossary")}>
+            Glossary
+          </button>
+        </nav>
       </header>
       <main>
         <section className="pane editor-pane" aria-label="XML editor">
           <div className="pane-bar">
             <h2>XML</h2>
+            {activeModule ? (
+              <button type="button" className="text-link dmc-link" data-testid="explain-dmc" onClick={() => openGlossary("dmc")}>
+                {activeModule.dmc}
+              </button>
+            ) : null}
             {docs.length > 1 ? (
               <div className="tabs" role="tablist" aria-label="Data modules">
                 {docs.map((doc, index) => (
@@ -160,15 +187,29 @@ export function App() {
         <section className="pane result-pane" aria-label="Runner and flow">
           <div className="pane-bar">
             <div className="tabs" role="tablist" aria-label="Runner views">
-              <button type="button" role="tab" data-testid="view-runner" aria-selected={pane === "runner"} onClick={() => setPane("runner")}>
+              <button type="button" role="tab" data-testid="view-runner" aria-selected={surface === "runner"} onClick={() => setSurface("runner")}>
                 Runner
               </button>
-              <button type="button" role="tab" data-testid="view-flow" aria-selected={pane === "flow"} onClick={() => setPane("flow")}>
+              <button type="button" role="tab" data-testid="view-flow" aria-selected={surface === "flow"} onClick={() => setSurface("flow")}>
                 Flow
+              </button>
+              <button type="button" role="tab" data-testid="view-glossary" aria-selected={surface === "glossary"} onClick={() => setSurface("glossary")}>
+                Glossary
               </button>
             </div>
           </div>
-          {pane === "runner" ? (
+          {surface === "flow" ? (
+            <FlowView
+              modules={library.modules}
+              currentDmc={current?.dmc}
+              currentStepId={current?.stepId}
+              focusedDmc={focus?.dmc}
+              focusedStepId={focus?.stepId}
+              onSelect={focusStep}
+            />
+          ) : surface === "glossary" ? (
+            <GlossaryPanel focusId={glossaryId} sampleDmc={activeModule?.dmc} onOpen={openGlossary} />
+          ) : (
             <RunnerPanel
               state={current}
               outline={runnerModule ? outlineOf(runnerModule) : []}
@@ -180,15 +221,7 @@ export function App() {
                 if (!current) return;
                 focusStep(current.dmc, stepId as StepId);
               }}
-            />
-          ) : (
-            <FlowView
-              modules={library.modules}
-              currentDmc={current?.dmc}
-              currentStepId={current?.stepId}
-              focusedDmc={focus?.dmc}
-              focusedStepId={focus?.stepId}
-              onSelect={focusStep}
+              onExplain={openGlossary}
             />
           )}
         </section>

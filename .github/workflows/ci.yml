@@ -19,4 +19,5 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npx playwright install --with-deps chromium
-      - run: npm run e2e
+      - name: e2e on desktop, iPhone 390x844, and Android 360x800
+        run: npm run e2e
