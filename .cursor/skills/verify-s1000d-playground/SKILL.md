@@ -44,7 +44,7 @@ With the server from Launch still running, run the Playwright suite from the rep
 npx playwright test
 ```
 
-The suite is `e2e/walk.spec.ts`. It is the harness. It loads every sample, clicks every answer including call and return, checks the highlight, and writes the screenshots named in Evidence.
+The suite is `e2e/walk.spec.ts` plus `e2e/mobile.spec.ts`. It is the harness. It loads every sample, clicks every answer including call and return, checks the highlight, walks the phone tabs at 390 by 844 and 360 by 800, and writes the screenshots named in Evidence.
 
 Drive the feature you changed even when the suite is broader. The selectors below are the ones the suite uses.
 
@@ -54,6 +54,8 @@ Drive the feature you changed even when the suite is broader. The selectors belo
 - The outline button is `[data-testid="outline-step"][data-step-id="..."]`. `data-focused` is the XML selection. `data-current` is the runner step. Those two differ when the user clicks the outline or the XML without answering.
 - The highlight is `.cm-step`. Clicking a `.cm-line` that contains an `id` attribute focuses that step.
 - Flow is `[data-testid="view-flow"]` and `[data-testid="flow-node"][data-step-id="..."]`.
+- Below 980px the phone switcher is `[data-testid="surface-runner"]`, `[data-testid="surface-xml"]`, `[data-testid="surface-flow"]`, and `[data-testid="surface-glossary"]`. The runner tab is selected on load. At 1600px the right pane tabs are `[data-testid="view-runner"]`, `[data-testid="view-flow"]`, and `[data-testid="view-glossary"]`.
+- The data module code is `[data-testid="dmc"]` in the runner and `[data-testid="explain-dmc"]` in the XML bar. Both open the glossary. `[data-testid="explain-isolation-step"]` opens the `isolationStep` entry.
 - A clear sample shows `[data-testid="validation-ok"]`. A broken document shows `[data-testid="diagnostic"]`.
 
 Cover every feature file that the change can affect. Do not mark a sample verified because a different sample passed.
@@ -71,8 +73,11 @@ Cover every feature file that the change can affect. Do not mark a sample verifi
 - `linear-mid.png` shows `cool-wipe` between the first and last coolant steps.
 - `lamp-dialog.png` shows the question `Did the lamp light?`.
 - `broken-xml.png` shows a well-formedness diagnostic and the empty runner.
+- `mobile-iphone-runner.png`, `mobile-iphone-xml.png`, and `mobile-iphone-flow.png` are the 390 by 844 iPhone views. The runner shot is on `bat-load`. XML and Flow are the other two tabs.
+- `mobile-android-runner.png`, `mobile-android-xml.png`, and `mobile-android-flow.png` are the same three tabs at 360 by 800.
+- `mobile-iphone-glossary.png` and `mobile-android-glossary.png` show the glossary as the only pane. The entries are the Issue 7 schema readings.
 
-Open every PNG and look at it. A passing Playwright process is not a visual pass. Confirm the sample title, the step title, the answer buttons, and the yellow highlight are actually visible. Confirm the two panes are side by side at the 1600 by 1000 viewport, not stacked. Reject a shot that is blank, clipped through the step card, or highlighting a different id than the one the spec named.
+Open every PNG and look at it. A passing Playwright process is not a visual pass. Confirm the sample title, the step title, the answer buttons, and the yellow highlight are actually visible. Confirm the two panes are side by side at the 1600 by 1000 viewport, not stacked. On the mobile shots, confirm one tab fills the width, the answer buttons are tall enough to tap, and the page does not scroll sideways. Reject a shot that is blank, clipped through the step card, or highlighting a different id than the one the spec named.
 
 The proof has to be the running app. Do not call the runner functions from a unit test and treat that as this skill.
 

@@ -29,5 +29,6 @@ Preconditions:
 ## Gotchas
 
 - The flow pane needs a real height. A graph that never appears is a layout failure, not a missing sample.
+- Below 980px, open Flow with `[data-testid="surface-flow"]`. The graph is the only pane, and it still has to have a real height.
 - React Flow's attribution stays visible. Hiding it is a license problem, not a verification step.
 - The broken-document check deletes the sample text in that browser session only. Reload `/` before the next feature. Do not treat the broken buffer as a failed sample picker.

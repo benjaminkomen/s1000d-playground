@@ -32,4 +32,5 @@ Preconditions:
 
 - The engine sample is two data modules. A single editor buffer with both documents concatenated is a failure.
 - Switching samples restarts the runner. An answer from the previous sample must not remain on screen.
+- Below 980px the sample blurbs are hidden and the buttons wrap onto more than one row. The desktop proof is still the 1600px shot. Phone tabs are the mobile-layout feature.
 - `validation-ok` must be the unmodified sample. An edited buffer is the flow-and-validation feature, not this one.

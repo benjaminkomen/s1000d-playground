@@ -41,3 +41,5 @@ Each feature file starts with an H1 and one paragraph. Then it uses these H2 sec
 - [Process runner](./process-runner.md) walks the coolant sequence and the lamp loop.
 - [XML highlight](./xml-highlight.md) syncs the outline, the editor cursor, and the yellow mark.
 - [Flow and validation](./flow-and-validation.md) selects a flow node and reports XML that is not well-formed.
+- [Mobile layout](./mobile-layout.md) swaps the panes for Runner, XML, Flow, and Glossary tabs below 980px.
+- [Glossary](./glossary.md) defines the Issue 7 names used in the samples.

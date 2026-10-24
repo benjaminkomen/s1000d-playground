@@ -51,6 +51,20 @@ button, input { font: inherit; }
   text-transform: uppercase;
 }
 
+.text-link {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.dmc-link { color: #6d6256; font-family: ui-monospace, monospace; font-size: 12px; }
+
 .samples {
   display: flex;
   gap: 8px;
@@ -239,6 +253,31 @@ main {
   overflow: auto;
 }
 
+.glossary {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 18px 24px;
+}
+
+.glossary article {
+  border-top: 1px solid #e4d7c6;
+  padding: 12px 0;
+}
+
+.glossary h3 { margin: 0 0 6px; font-size: 18px; }
+.glossary article[data-current="true"] h3 { background: #f6d98a; display: inline; }
+.glossary-see { display: flex; flex-wrap: wrap; gap: 6px; }
+.glossary-see button {
+  min-height: 44px;
+  border: 1px solid #d9cbb6;
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.glossary-source { color: #6d6256; font-size: 12px; overflow-wrap: anywhere; }
+
 .validation p, .validation ul { margin: 0; }
 .validation ul { padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
 .validation button {
@@ -253,10 +292,84 @@ main {
 }
 .validation button span { font-family: ui-monospace, monospace; margin-right: 8px; }
 
+.surface-tabs { display: none; }
+
 @media (max-width: 980px) {
-  .top { flex-direction: column; align-items: stretch; }
+  .top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 12px 12px;
+  }
+
+  .top h1 { font-size: 22px; }
   .samples { margin-left: 0; }
-  main { grid-template-columns: 1fr; }
-  .runner-body { grid-template-columns: 1fr; }
-  .editor-frame { min-height: 320px; }
+
+  .samples button {
+    width: calc(50% - 4px);
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+    min-height: 44px;
+  }
+
+  .samples button span { display: none; }
+
+  .surface-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+
+  .surface-tabs button {
+    min-height: 44px;
+    border: 1px solid #3a342c;
+    background: #2a251f;
+    color: #f6f0e6;
+    border-radius: 8px;
+    padding: 8px 4px;
+    font-size: 14px;
+  }
+
+  .surface-tabs button[aria-selected="true"] {
+    background: #0e5c56;
+    border-color: #0e5c56;
+  }
+
+  .app, .top, main, .pane { min-width: 0; max-width: 100%; }
+  main { grid-template-columns: minmax(0, 1fr); }
+  .result-pane > .pane-bar { display: none; }
+  .pane-bar, .tabs { flex-wrap: wrap; }
+
+  .app[data-surface="runner"] .editor-pane,
+  .app[data-surface="flow"] .editor-pane,
+  .app[data-surface="glossary"] .editor-pane,
+  .app[data-surface="xml"] .result-pane { display: none; }
+
+  .editor-frame { min-height: 0; }
+
+  .editor-frame,
+  .editor-frame .cm-editor,
+  .editor-frame .cm-scroller,
+  .flow-frame,
+  .flow-frame .react-flow {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .flow-frame { overflow: hidden; }
+  .runner-body { grid-template-columns: minmax(0, 1fr); }
+  .dmc, .crumbs, .prompt, .step-card, .validation { overflow-wrap: anywhere; }
+
+  .choices { flex-direction: column; }
+
+  .choices button,
+  .runner-nav button,
+  .text-link {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .choices button { width: 100%; }
+  .pane-bar .dmc-link { min-width: 0; max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
 }
